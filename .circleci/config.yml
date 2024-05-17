@@ -3,8 +3,7 @@ version: 2.1
 jobs:
   build:
     macos:
-      xcode: "14.2.0"
-    resource_class: macos.m1.medium.gen1
+      xcode: 15.0
     environment:
       SAUCE_USERNAME: your_sauce_username
       SAUCE_ACCESS_KEY: your_sauce_access_key
