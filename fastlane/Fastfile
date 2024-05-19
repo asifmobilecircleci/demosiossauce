@@ -3,13 +3,13 @@ default_platform(:ios)
 platform :ios do
   desc "Build and run tests"
   lane :build_and_test do
-    build_app(scheme: "DemoApp")
+    build_app(scheme: "DemoApp", export_method: "development", skip_package_ipa: true)
     run_tests(scheme: "DemoAppUITests")
   end
 
   desc "Upload IPA to Sauce Labs"
   lane :upload_to_sauce do
-    build_app(scheme: "DemoApp", export_method: "app-store")
+    build_app(scheme: "DemoApp", export_method: "development", skip_package_ipa: true)
     upload_to_sauce_labs
   end
 end
@@ -17,7 +17,7 @@ end
 private_lane :upload_to_sauce_labs do
   sauce_username = ENV['SAUCE_USERNAME']
   sauce_access_key = ENV['SAUCE_ACCESS_KEY']
-  app_path = Actions.lane_context[SharedValues::IPA_OUTPUT_PATH]
+  app_path = Actions.lane_context[SharedValues::APP_OUTPUT_PATH]
 
-  sh "curl -u #{sauce_username}:#{sauce_access_key} -X POST 'https://api.us-west-1.saucelabs.com/v1/storage/upload' -F 'file=@#{app_path}' -F 'name=DemoApp.ipa'"
+  sh "curl -u #{sauce_username}:#{sauce_access_key} -X POST 'https://api.us-west-1.saucelabs.com/v1/storage/upload' -F 'file=@#{app_path}' -F 'name=DemoApp.app'"
 end
