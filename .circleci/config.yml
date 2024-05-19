@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     macos:
-      xcode: "15.0"
+      xcode: "14.3.1"
     environment:
       SAUCE_USERNAME: your_sauce_username
       SAUCE_ACCESS_KEY: your_sauce_access_key
