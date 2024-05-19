@@ -2,7 +2,6 @@ default_platform(:ios)
 
 platform :ios do
   desc "Build and run tests"
-  xcversion(version: "15.0")
   lane :build_and_test do
     build_app(scheme: "DemoApp", export_method: "development", skip_package_ipa: true)
     run_tests(scheme: "DemoAppUITests", devices: ["iPhone 14"])
