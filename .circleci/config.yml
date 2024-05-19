@@ -3,20 +3,20 @@ version: 2.1
 jobs:
   build:
     macos:
-      xcode: 15.0
+      xcode: "15.0"
     environment:
       SAUCE_USERNAME: your_sauce_username
       SAUCE_ACCESS_KEY: your_sauce_access_key
     steps:
       - checkout
       - run:
-          name: Install dependencies
+          name: Install Fastlane
           command: bundle install
       - run:
           name: Build and run tests
           command: bundle exec fastlane build_and_test
       - run:
-          name: Upload to Sauce Labs
+          name: Upload app and test runner to Sauce Labs
           command: bundle exec fastlane upload_to_sauce
 
 workflows:
