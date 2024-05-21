@@ -1,0 +1,18 @@
+apiVersion: v1alpha
+metadata:
+  name: XCUITest Example
+  tags:
+    - example
+suites:
+  - name: "iOS Sample App Tests"
+    testOptions:
+      app: $SAUCE_STORAGE_URL_APP
+      testApp: $SAUCE_STORAGE_URL_TEST
+      framework: xcuitest
+    devices:
+      - name: "iPhone 12"
+        platformVersion: "14.5"
+        options:
+          carrierConnectivity: false
+          deviceType: "PHONE"
+          private: false
