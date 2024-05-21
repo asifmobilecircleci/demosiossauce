@@ -1,42 +1,37 @@
-require 'json'
-
 platform :ios do
-  desc "Build and export the app IPA"
-  lane :build_app do
+
+  desc "Build the app and test IPA, then upload to Sauce Labs"
+  lane :build_and_upload do
+
+    # Build the app IPA
     build_app(
       scheme: "DemoApp",
       export_method: "development",
-      output_directory: "./output"
+      output_directory: "./output",
+      output_name: "DemoApp.ipa"
     )
-  end
 
-  desc "Build and export the test runner IPA"
-  lane :build_test_runner do
+    # Build the test IPA for UI testing
     build_app(
-      scheme: "DemoAppUITests",
+      scheme: "DemoApp",
+      configuration: "Debug",
       export_method: "development",
-      output_directory: "./output"
+      output_directory: "./output",
+      output_name: "DemoAppTest.ipa"
     )
+
+    # Upload to Sauce Labs
+    sh "curl -u $SAUCE_USERNAME:$SAUCE_ACCESS_KEY -X POST -H 'Content-Type: application/octet-stream' https://api.us-west-1.saucelabs.com/v1/storage/upload --data-binary @./output/DemoAppTest.ipa?overwrite=true"
   end
 
-  desc "Upload IPA to Sauce Labs"
-  lane :upload_to_sauce_labs do |options|
-    ipa_path = options[:ipa_path]
-    test_ipa_path = options[:test_ipa_path]
-
-    app_response = sh("curl -u $SAUCE_USERNAME:$SAUCE_ACCESS_KEY -X POST -H 'Content-Type: application/octet-stream' https://api.us-west-1.saucelabs.com/v1/storage/upload --data-binary @#{ipa_path}")
-    test_response = sh("curl -u $SAUCE_USERNAME:$SAUCE_ACCESS_KEY -X POST -H 'Content-Type: application/octet-stream' https://api.us-west-1.saucelabs.com/v1/storage/upload --data-binary @#{test_ipa_path}")
-
-    app_id = JSON.parse(app_response)["item"]["id"]
-    test_id = JSON.parse(test_response)["item"]["id"]
-
-    sh "echo 'SAUCE_STORAGE_URL_APP=storage:#{app_id}' >> sauce.env"
-    sh "echo 'SAUCE_STORAGE_URL_TEST=storage:#{test_id}' >> sauce.env"
-  end
-
-  desc "Run XCUITest on Sauce Labs"
-  lane :run_xcuitest do
-    sh "source sauce.env"
-    sh "saucectl run --config ./sauce.config.yml --username $SAUCE_USERNAME --accessKey $SAUCE_ACCESS_KEY"
+  desc "Run XCUI tests on Sauce Labs"
+  lane :run_xcui_tests_on_sauce_lab do
+    scan(
+      scheme: "SampleAppUITests",
+      devices: ["iPhone 12"],
+      derived_data_path: "./output/derived_data",
+      output_directory: "./output/test_output",
+      result_bundle: true
+    )
   end
 end
